@@ -6,6 +6,7 @@ class EmployeeOut(BaseModel):
     pavarde: str
     el_pastas: str
     pareigos: str
+    links: List[Dict]
 
     class Config:
         orm_mode = True
