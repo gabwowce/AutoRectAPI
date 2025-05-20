@@ -3,12 +3,16 @@ from sqlalchemy.orm import Session
 from db.session import get_db
 from schemas.invoice import InvoiceCreate, InvoiceStatusUpdate, InvoiceOut
 from repositories import invoice as crud_invoice
+from utils.hateoas import generate_links
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/invoices",
+    tags=["Invoices"]
+)
 
 @router.get("/", response_model=list[InvoiceOut])
 def get_all_invoices(db: Session = Depends(get_db)):
-    raw_data = crud_invoice.get_all_invoices_with_clients(db)  # tavo custom SELECT
+    raw_data = crud_invoice.get_all_invoices_with_clients(db)
     return [
         {
             **invoice.__dict__,
@@ -16,10 +20,14 @@ def get_all_invoices(db: Session = Depends(get_db)):
         }
         for invoice in raw_data
     ]
-    
+
 @router.post("/", response_model=InvoiceOut)
 def create_invoice(invoice: InvoiceCreate, db: Session = Depends(get_db)):
-    return crud_invoice.create_invoice(db, invoice)
+    created = crud_invoice.create_invoice(db, invoice)
+    return {
+        **created.__dict__,
+        "links": generate_links("invoices", created.invoice_id, ["update_status", "delete"])
+    }
 
 @router.delete("/{invoice_id}")
 def delete_invoice(invoice_id: int, db: Session = Depends(get_db)):
@@ -33,4 +41,8 @@ def update_status(invoice_id: int, status: InvoiceStatusUpdate, db: Session = De
     updated = crud_invoice.update_invoice_status(db, invoice_id, status)
     if not updated:
         raise HTTPException(status_code=404, detail="Invoice not found")
-    return updated
+    return {
+        **updated.__dict__,
+        "links": generate_links("invoices", updated.invoice_id, ["update_status", "delete"])
+    }
+
