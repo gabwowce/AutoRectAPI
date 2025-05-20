@@ -5,7 +5,10 @@ from app.repositories import car as car_repo
 from app.schemas.car import CarOut, CarCreate, CarUpdate, CarStatusUpdate
 from utils.hateoas import generate_links
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/cars",  
+)
+
 
 @router.get("/", response_model=list[CarOut])
 def get_all_cars(db: Session = Depends(get_db)):
