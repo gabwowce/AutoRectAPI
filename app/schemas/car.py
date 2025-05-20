@@ -24,6 +24,7 @@ class CarOut(BaseModel):
     technikines_galiojimas: date
     dabartine_vieta_id: int
     pastabos: Optional[str]
+    links: List[Dict]
 
     class Config:
         orm_mode = True
