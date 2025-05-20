@@ -16,11 +16,15 @@ def get_all_orders(db: Session = Depends(get_db)):
     return [
         {
             **order.__dict__,
-            "links": generate_links("orders", order.uzsakymo_id, ["delete"])
+            "links": [
+                {"rel": "self", "href": f"/orders/{order.uzsakymo_id}"},
+                {"rel": "client", "href": f"/clients/{order.kliento_id}"},
+                {"rel": "car", "href": f"/cars/{order.automobilio_id}"},
+                {"rel": "delete", "href": f"/orders/{order.uzsakymo_id}"}
+            ]
         }
         for order in orders
     ]
-
 @router.get("/{uzsakymo_id}", response_model=schemas.OrderOut)
 def get_order(uzsakymo_id: int, db: Session = Depends(get_db)):
     order = repo.get_by_id(db, uzsakymo_id)
@@ -28,7 +32,12 @@ def get_order(uzsakymo_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Order not found")
     return {
         **order.__dict__,
-        "links": generate_links("orders", order.uzsakymo_id, ["delete"])
+        "links": [
+            {"rel": "self", "href": f"/orders/{order.uzsakymo_id}"},
+            {"rel": "client", "href": f"/clients/{order.kliento_id}"},
+            {"rel": "car", "href": f"/cars/{order.automobilio_id}"},
+            {"rel": "delete", "href": f"/orders/{order.uzsakymo_id}"}
+        ]
     }
 
 @router.post("/", response_model=schemas.OrderOut)
