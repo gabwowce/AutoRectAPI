@@ -22,3 +22,25 @@ def delete(db: Session, uzsakymo_id: int):
         db.commit()
         return True
     return False
+    
+def get_order_counts_by_status(db: Session):
+    results = (
+        db.query(Order.uzsakymo_busena, func.count().label("value"))
+        .group_by(Order.uzsakymo_busena)
+        .all()
+    )
+
+    # Žemėlapis pavadinimų iš duomenų į frontend formatą
+    status_map = {
+        "vykdomas": "Vykdomi",
+        "užbaigtas": "Užbaigti",
+        "atšauktas": "Atšaukti"
+    }
+
+    return [
+        {
+            "name": status_map.get(row.uzsakymo_busena, row.uzsakymo_busena),
+            "value": row.value
+        }
+        for row in results
+    ]
