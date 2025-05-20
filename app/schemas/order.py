@@ -12,6 +12,7 @@ class OrderBase(BaseModel):
     bendra_kaina: int
     uzsakymo_busena: str
     turi_papildomas_paslaugas: bool
+    links: List[Dict]
 
 class OrderCreate(OrderBase):
     pass
