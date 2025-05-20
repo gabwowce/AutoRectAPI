@@ -54,3 +54,7 @@ def delete_order(uzsakymo_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Order not found")
     return {"ok": True}
+
+def get_by_client_id(db: Session, kliento_id: int):
+    return db.query(Order).filter(Order.kliento_id == kliento_id).all()
+
