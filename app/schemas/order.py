@@ -28,6 +28,8 @@ class OrderUpdate(BaseModel):
 # 4️⃣ Naudojama atsakymams (su ID ir HATEOAS)
 class OrderOut(OrderBase):
     uzsakymo_id: int
+    kliento_id: int
+    automobilio_id: int
     links: List[Dict]
 
     class Config:
