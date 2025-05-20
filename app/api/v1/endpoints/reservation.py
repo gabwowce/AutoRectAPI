@@ -4,6 +4,8 @@ from app.api.deps import get_db
 from app.schemas import reservation as schemas
 from app.repositories import reservation as repo
 from utils.hateoas import generate_links
+from typing import Optional
+from datetime import date
 
 router = APIRouter(
     prefix="/reservations",
@@ -70,4 +72,34 @@ def get_latest_reservations(db: Session = Depends(get_db), limit: int = 5):
             ]
         }
         for r in results
+    ]
+
+@router.get("/search", response_model=list[schemas.ReservationOut])
+def search_reservations(
+    db: Session = Depends(get_db),
+    kliento_id: Optional[int] = None,
+    automobilio_id: Optional[int] = None,
+    nuo: Optional[date] = None,
+    iki: Optional[date] = None,
+    busena: Optional[str] = None
+):
+    results = repo.search_reservations(
+        db,
+        kliento_id=kliento_id,
+        automobilio_id=automobilio_id,
+        nuo=nuo,
+        iki=iki,
+        busena=busena
+    )
+
+    return [
+        {
+            **res.__dict__,
+            "links": [
+                {"rel": "self", "href": f"/reservations/{res.rezervacijos_id}"},
+                {"rel": "client", "href": f"/clients/{res.kliento_id}"},
+                {"rel": "car", "href": f"/cars/{res.automobilio_id}"}
+            ]
+        }
+        for res in results
     ]
