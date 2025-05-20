@@ -7,6 +7,7 @@ class ReservationBase(BaseModel):
     rezervacijos_pradzia: date
     rezervacijos_pabaiga: date
     busena: str
+    links: List[Dict]
 
 class ReservationCreate(ReservationBase):
     pass
