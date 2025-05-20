@@ -23,6 +23,8 @@ class ReservationUpdate(BaseModel):
 # 4️⃣ Schema atsakymui į klientą (su ID ir links)
 class ReservationOut(ReservationBase):
     rezervacijos_id: int
+    kliento_id: int
+    automobilio_id: int
     links: List[Dict]
 
     class Config:
