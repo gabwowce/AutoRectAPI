@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1.endpoints import auth, employee, car, reservation, order, client, client_support, invoice
+from app.api.v1.endpoints import auth, employee, car, reservation, order, client, client_support, invoice, weather
 from app.db.base import Base
 from app.db.session import engine
 from dotenv import load_dotenv
@@ -17,3 +17,4 @@ app.include_router(order.router, prefix="/api/v1/order", tags=["Order"])
 app.include_router(client.router, prefix="/api/v1/client", tags=["Client"])
 app.include_router(client_support.router, prefix="/api/v1/client_support", tags=["Client Support"])
 app.include_router(saskaitos.router, prefix="/api/v1/saskaitos", tags=["Saskaitos"])
+app.include_router(weather.router, prefix="/api/v1", tags=["Weather"])
