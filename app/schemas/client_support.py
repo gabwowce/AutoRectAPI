@@ -10,6 +10,7 @@ class ClientSupportBase(BaseModel):
     atsakymas: Optional[str] = None
     pateikimo_data: datetime
     atsakymo_data: Optional[datetime] = None
+    links: List[Dict]
 
 class ClientSupportCreate(ClientSupportBase):
     pass
