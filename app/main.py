@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1.endpoints import auth, employee, car, reservation, order, client
+from app.api.v1.endpoints import auth, employee, car, reservation, order, client, client_support
 from app.db.base import Base
 from app.db.session import engine
 
@@ -13,3 +13,4 @@ app.include_router(car.router, prefix="/api/v1/cars", tags=["Cars"])
 app.include_router(reservation.router, prefix="/api/v1/reservation", tags=["Reservation"])
 app.include_router(order.router, prefix="/api/v1/order", tags=["Order"])
 app.include_router(client.router, prefix="/api/v1/client", tags=["Client"])
+app.include_router(client_support.router, prefix="/api/v1/client_support", tags=["Client Support"])
