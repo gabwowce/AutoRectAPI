@@ -3,19 +3,30 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_current_user
 from app.repositories import car as car_repo
 from app.schemas.car import CarOut, CarCreate, CarUpdate, CarStatusUpdate
+from utils.hateoas import generate_links
 
 router = APIRouter()
 
 @router.get("/", response_model=list[CarOut])
 def get_all_cars(db: Session = Depends(get_db)):
-    return car_repo.get_all(db)
+    cars = car_repo.get_all(db)
+    return [
+        {
+            **car.__dict__,
+            "links": generate_links("cars", car.id, ["update", "delete", "update_status"])
+        }
+        for car in cars
+    ]
 
 @router.get("/{car_id}", response_model=CarOut)
 def get_car(car_id: int, db: Session = Depends(get_db)):
     car = car_repo.get_by_id(db, car_id)
     if not car:
         raise HTTPException(status_code=404, detail="Car not found")
-    return car
+    return {
+        **car.__dict__,
+        "links": generate_links("cars", car.id, ["update", "delete", "update_status"])
+    }
 
 @router.post("/", response_model=CarOut)
 def create_car(data: CarCreate, db: Session = Depends(get_db)):
