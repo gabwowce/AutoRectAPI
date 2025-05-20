@@ -45,3 +45,20 @@ def delete_reservation(rezervacijos_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Reservation not found")
     return {"ok": True}
+
+@router.get("/latest", response_model=list[schemas.ReservationSummary])
+def get_latest_reservations(db: Session = Depends(get_db), limit: int = 5):
+    results = repo.get_latest_reservations_with_details(db, limit=limit)
+    return [
+        {
+            "rezervacijos_id": r.rezervacijos_id,
+            "rezervacijos_pradzia": r.rezervacijos_pradzia,
+            "rezervacijos_pabaiga": r.rezervacijos_pabaiga,
+            "marke": r.marke,
+            "modelis": r.modelis,
+            "vardas": r.vardas,
+            "pavarde": r.pavarde,
+            # "links": generate_links("reservations", r.rezervacijos_id, ["delete"])
+        }
+        for r in results
+    ]
