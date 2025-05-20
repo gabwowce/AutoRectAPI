@@ -31,6 +31,8 @@ def get_latest_reservations_with_details(db: Session, limit: int = 5):
     return (
         db.query(
             Reservation.rezervacijos_id,
+            Reservation.kliento_id,
+            Reservation.automobilio_id,
             Reservation.rezervacijos_pradzia,
             Reservation.rezervacijos_pabaiga,
             Car.marke,
