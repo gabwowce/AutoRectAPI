@@ -38,3 +38,17 @@ def logout():
 @router.get("/me", response_model=UserInfo)
 def me(current_user = Depends(get_current_user)):
     return current_user
+
+@router.post("/change-password")
+def change_password(
+    request: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    user = employee_repo.get_by_email(db, current_user.el_pastas)
+    if not verify_password(request.senas_slaptazodis, user.slaptazodis):
+        raise HTTPException(status_code=400, detail="Wrong current password")
+
+    user.slaptazodis = get_password_hash(request.naujas_slaptazodis)
+    db.commit()
+    return {"message": "Password updated successfully"}
