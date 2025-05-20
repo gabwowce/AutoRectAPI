@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from app.api.v1.endpoints import auth, employee, car, reservation, order, client, client_support, invoice
 from app.db.base import Base
 from app.db.session import engine
+from dotenv import load_dotenv
 
+load_dotenv()
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Car Rental API")
