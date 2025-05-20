@@ -19,9 +19,13 @@ class InvoiceStatusUpdate(BaseModel):
 # 4️⃣ Atsakymui į klientą su papildoma info
 class InvoiceOut(InvoiceBase):
     invoice_id: int
+    order_id: int
+    kliento_id: int
+    total: float
+    invoice_date: date
+    status: str
     client_first_name: str
     client_last_name: str
-    status: str
     links: List[Dict]
 
     class Config:
