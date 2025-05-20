@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from datetime import date
+from datetime import date,datetime
 from typing import List, Dict
 
 # 1️⃣ Bendri laukai (tėvinė schema)
@@ -9,7 +9,7 @@ class ClientBase(BaseModel):
     el_pastas: EmailStr
     telefono_nr: str
     gimimo_data: date
-    registracijos_data: date
+    registracijos_data: datetime
     bonus_taskai: int
 
 # 2️⃣ Schema kurti naujam klientui

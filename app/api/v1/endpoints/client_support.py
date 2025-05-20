@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from db.session import get_db
-from schemas.client_support import ClientSupportCreate, ClientSupportOut, ClientSupportUpdate
-from crud import client_support
+from app.api.deps import get_db
+from app.schemas.client_support import ClientSupportCreate, ClientSupportOut, ClientSupportUpdate
+from app.repositories import client_support
 
 router = APIRouter(
     prefix="/support",

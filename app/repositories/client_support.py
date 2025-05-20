@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from models import client_support
-from schemas.client_support import ClientSupportCreate
+from app.models import client_support
+from app.models.client_support import ClientSupport
+from app.schemas.client_support import ClientSupportCreate, ClientSupportUpdate
 
 def create_support_request(db: Session, support_data: ClientSupportCreate):
     db_support = client_support.ClientSupport(**support_data.dict())

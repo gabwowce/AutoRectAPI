@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.auth import LoginRequest, TokenResponse, RegisterRequest, UserInfo
+from app.schemas.auth import LoginRequest, TokenResponse, RegisterRequest, UserInfo, ChangePasswordRequest
 from app.db.session import SessionLocal
 from app.repositories import employee as employee_repo
 from app.services.auth_service import verify_password, create_access_token, get_password_hash

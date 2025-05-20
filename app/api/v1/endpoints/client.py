@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
-from app.schemas import client as schemas
+from app.schemas import client as schemas_client
+from app.schemas import order as schemas_order
+
 from app.repositories import client as repo
 from utils.hateoas import generate_links
 
@@ -9,7 +11,7 @@ router = APIRouter(
     prefix="/clients",  
 )
 
-@router.get("/", response_model=list[schemas.ClientOut])
+@router.get("/", response_model=list[schemas_client.ClientOut])
 def get_all_clients(db: Session = Depends(get_db)):
     clients = repo.get_all(db)
     return [
@@ -20,7 +22,7 @@ def get_all_clients(db: Session = Depends(get_db)):
         for client in clients
     ]
 
-@router.get("/{kliento_id}", response_model=schemas.ClientOut)
+@router.get("/{kliento_id}", response_model=schemas_client.ClientOut)
 def get_client(kliento_id: int, db: Session = Depends(get_db)):
     client = repo.get_by_id(db, kliento_id)
     if not client:
@@ -30,8 +32,8 @@ def get_client(kliento_id: int, db: Session = Depends(get_db)):
         "links": generate_links("clients", client.kliento_id, ["update", "delete"])
     }
 
-@router.post("/", response_model=schemas.ClientOut)
-def create_client(client: schemas.ClientCreate, db: Session = Depends(get_db)):
+@router.post("/", response_model=schemas_client.ClientOut)
+def create_client(client: schemas_client.ClientCreate, db: Session = Depends(get_db)):
     created = repo.create(db, client)
     return {
         **created.__dict__,
@@ -46,7 +48,7 @@ def delete_client(kliento_id: int, db: Session = Depends(get_db)):
     return {"ok": True}
 
 
-@router.get("/{kliento_id}/orders", response_model=list[schemas.OrderOut])
+@router.get("/{kliento_id}/orders", response_model=list[schemas_order.OrderOut])
 def get_client_orders(kliento_id: int, db: Session = Depends(get_db)):
     orders = repo.get_by_client_id(db, kliento_id)
     return [

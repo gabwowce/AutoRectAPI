@@ -2,11 +2,14 @@ import requests
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from datetime import datetime
+from dotenv import load_dotenv
 import os
 
 router = APIRouter()
 
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+OPENWEATHER_API_KEY = "93dde574b8b9262f8f1a1590f1bdf790"
+
+
 
 @router.get("/weather")
 def get_weather_forecast(city: str = Query(...), date: str = Query(...)):

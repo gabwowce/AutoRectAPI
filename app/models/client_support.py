@@ -16,3 +16,4 @@ class ClientSupport(Base):
 
     kliento = relationship("Client", back_populates="uzklausos")
     darbuotojas = relationship("Employee", back_populates="uzklausos")
+    

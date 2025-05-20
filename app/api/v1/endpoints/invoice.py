@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from db.session import get_db
-from schemas.invoice import InvoiceCreate, InvoiceStatusUpdate, InvoiceOut
-from repositories import invoice as crud_invoice
+from app.api.deps import get_db
+from app.schemas.invoice import InvoiceCreate, InvoiceStatusUpdate, InvoiceOut
+from app.repositories import invoice as crud_invoice
 from utils.hateoas import generate_links
 
 router = APIRouter(
@@ -11,21 +11,21 @@ router = APIRouter(
 )
 
 def generate_invoice_links(invoice) -> list[dict]:
+    get = lambda obj, key: obj.get(key) if isinstance(obj, dict) else getattr(obj, key)
     return [
-        {"rel": "self", "href": f"/invoices/{invoice.invoice_id}"},
-        {"rel": "order", "href": f"/orders/{invoice.order_id}"},
-        {"rel": "client", "href": f"/clients/{invoice.kliento_id}"},
-        {"rel": "update_status", "href": f"/invoices/{invoice.invoice_id}/status"},
-        {"rel": "delete", "href": f"/invoices/{invoice.invoice_id}"}
+        {"rel": "self", "href": f"/invoices/{get(invoice, 'saskaitos_id')}"},
+        {"rel": "order", "href": f"/orders/{get(invoice, 'uzsakymo_id')}"},
+        {"rel": "update_status", "href": f"/invoices/{get(invoice, 'saskaitos_id')}/status"},
+        {"rel": "delete", "href": f"/invoices/{get(invoice, 'saskaitos_id')}"}
     ]
 
 
 @router.get("/", response_model=list[InvoiceOut])
 def get_all_invoices(db: Session = Depends(get_db)):
-    raw_data = crud_invoice.get_all_invoices_with_clients(db)
+    raw_data = crud_invoice.get_invoice(db)  # tai yra sąrašas dict'ų
     return [
         {
-            **invoice.__dict__,
+            **invoice,
             "links": generate_invoice_links(invoice)
         }
         for invoice in raw_data
@@ -33,11 +33,12 @@ def get_all_invoices(db: Session = Depends(get_db)):
 
 @router.post("/", response_model=InvoiceOut)
 def create_invoice(invoice: InvoiceCreate, db: Session = Depends(get_db)):
-    created = crud_invoice.create_invoice(db, invoice)
+    created = crud_invoice.create_invoice(db, invoice)  # ORM objektas
     return {
         **created.__dict__,
-        "links": generate_invoice_links(created)
+        "links": generate_invoice_links(created.__dict__)  # čia jau reikia dict
     }
+
 @router.delete("/{invoice_id}")
 def delete_invoice(invoice_id: int, db: Session = Depends(get_db)):
     success = crud_invoice.delete_invoice(db, invoice_id)
@@ -52,5 +53,5 @@ def update_status(invoice_id: int, status: InvoiceStatusUpdate, db: Session = De
         raise HTTPException(status_code=404, detail="Invoice not found")
     return {
         **updated.__dict__,
-        "links": generate_invoice_links(updated)
+        "links": generate_invoice_links(updated.__dict__)
     }
