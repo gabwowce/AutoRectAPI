@@ -10,13 +10,23 @@ router = APIRouter(
     tags=["Invoices"]
 )
 
+def generate_invoice_links(invoice) -> list[dict]:
+    return [
+        {"rel": "self", "href": f"/invoices/{invoice.invoice_id}"},
+        {"rel": "order", "href": f"/orders/{invoice.order_id}"},
+        {"rel": "client", "href": f"/clients/{invoice.kliento_id}"},
+        {"rel": "update_status", "href": f"/invoices/{invoice.invoice_id}/status"},
+        {"rel": "delete", "href": f"/invoices/{invoice.invoice_id}"}
+    ]
+
+
 @router.get("/", response_model=list[InvoiceOut])
 def get_all_invoices(db: Session = Depends(get_db)):
     raw_data = crud_invoice.get_all_invoices_with_clients(db)
     return [
         {
             **invoice.__dict__,
-            "links": generate_links("invoices", invoice.invoice_id, ["update_status", "delete"])
+            "links": generate_invoice_links(invoice)
         }
         for invoice in raw_data
     ]
@@ -26,9 +36,8 @@ def create_invoice(invoice: InvoiceCreate, db: Session = Depends(get_db)):
     created = crud_invoice.create_invoice(db, invoice)
     return {
         **created.__dict__,
-        "links": generate_links("invoices", created.invoice_id, ["update_status", "delete"])
+        "links": generate_invoice_links(created)
     }
-
 @router.delete("/{invoice_id}")
 def delete_invoice(invoice_id: int, db: Session = Depends(get_db)):
     success = crud_invoice.delete_invoice(db, invoice_id)
@@ -43,6 +52,5 @@ def update_status(invoice_id: int, status: InvoiceStatusUpdate, db: Session = De
         raise HTTPException(status_code=404, detail="Invoice not found")
     return {
         **updated.__dict__,
-        "links": generate_links("invoices", updated.invoice_id, ["update_status", "delete"])
+        "links": generate_invoice_links(updated)
     }
-
