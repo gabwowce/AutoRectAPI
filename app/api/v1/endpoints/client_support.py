@@ -57,3 +57,13 @@ def answer_to_support(uzklausos_id: int, data: ClientSupportUpdate, db: Session 
         "links": build_support_links(updated)
     }
 
+@router.get("/unanswered", response_model=list[ClientSupportOut])
+def get_unanswered_supports(db: Session = Depends(get_db)):
+    items = client_support.get_unanswered_requests(db)
+    return [
+        {
+            **item.__dict__,
+            "links": build_support_links(item)
+        }
+        for item in items
+    ]
