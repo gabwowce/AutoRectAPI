@@ -6,6 +6,7 @@ class InvoiceBase(BaseModel):
     order_id: int
     total: float
     invoice_date: date
+    links: List[Dict]
 
 class InvoiceCreate(InvoiceBase):
     pass
