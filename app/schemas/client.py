@@ -9,6 +9,7 @@ class ClientBase(BaseModel):
     gimimo_data: date
     registracijos_data: date
     bonus_taskai: int
+    links: List[Dict]
 
 class ClientCreate(ClientBase):
     pass
