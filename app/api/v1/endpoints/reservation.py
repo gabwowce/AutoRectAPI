@@ -16,10 +16,15 @@ def get_all_reservations(db: Session = Depends(get_db)):
     return [
         {
             **res.__dict__,
-            "links": generate_links("reservations", res.rezervacijos_id, ["delete"])
+            "links": [
+                {"rel": "self", "href": f"/reservations/{res.rezervacijos_id}"},
+                {"rel": "client", "href": f"/clients/{res.kliento_id}"},
+                {"rel": "car", "href": f"/cars/{res.automobilio_id}"}
+            ]
         }
         for res in reservations
     ]
+
 
 @router.get("/{rezervacijos_id}", response_model=schemas.ReservationOut)
 def get_reservation(rezervacijos_id: int, db: Session = Depends(get_db)):
@@ -58,7 +63,11 @@ def get_latest_reservations(db: Session = Depends(get_db), limit: int = 5):
             "modelis": r.modelis,
             "vardas": r.vardas,
             "pavarde": r.pavarde,
-            # "links": generate_links("reservations", r.rezervacijos_id, ["delete"])
+            "links": [
+                {"rel": "self", "href": f"/reservations/{r.rezervacijos_id}"},
+                {"rel": "client", "href": f"/clients/{r.kliento_id}"},
+                {"rel": "car", "href": f"/cars/{r.automobilio_id}"}
+            ]
         }
         for r in results
     ]
