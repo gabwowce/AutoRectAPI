@@ -4,6 +4,7 @@ from app.api.deps import get_db, get_current_user
 from app.repositories import car as car_repo
 from app.schemas.car import CarOut, CarCreate, CarUpdate, CarStatusUpdate
 from utils.hateoas import generate_links
+from typing import Optional
 
 router = APIRouter(
     prefix="/cars",  
@@ -71,3 +72,33 @@ def update_car_status(car_id: int, data: CarStatusUpdate, db: Session = Depends(
 @router.get("/stats/by-status")
 def get_car_stats_by_status(db: Session = Depends(get_db)):
     return car_repo.get_car_counts_by_status(db)
+
+@router.get("/search", response_model=list[CarOut])
+def search_cars(
+    db: Session = Depends(get_db),
+    marke: Optional[str] = None,
+    modelis: Optional[str] = None,
+    spalva: Optional[str] = None,
+    status: Optional[str] = None,
+    kuro_tipas: Optional[str] = None,
+    metai: Optional[int] = None,
+    sedimos_vietos: Optional[int] = None
+):
+    results = car_repo.search_cars(
+        db,
+        marke=marke,
+        modelis=modelis,
+        spalva=spalva,
+        status=status,
+        kuro_tipas=kuro_tipas,
+        metai=metai,
+        sedimos_vietos=sedimos_vietos
+    )
+
+    return [
+        {
+            **car.__dict__,
+            "links": generate_links("cars", car.id, ["update", "delete", "update_status"])
+        }
+        for car in results
+    ]
