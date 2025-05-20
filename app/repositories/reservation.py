@@ -47,3 +47,26 @@ def get_latest_reservations_with_details(db: Session, limit: int = 5):
         .all()
     )
 
+def search_reservations(
+    db: Session,
+    kliento_id: int = None,
+    automobilio_id: int = None,
+    nuo: date = None,
+    iki: date = None,
+    busena: str = None
+):
+    query = db.query(Reservation)
+
+    if kliento_id:
+        query = query.filter(Reservation.kliento_id == kliento_id)
+    if automobilio_id:
+        query = query.filter(Reservation.automobilio_id == automobilio_id)
+    if nuo:
+        query = query.filter(Reservation.rezervacijos_pradzia >= nuo)
+    if iki:
+        query = query.filter(Reservation.rezervacijos_pabaiga <= iki)
+    if busena:
+        query = query.filter(Reservation.busena == busena)
+
+    return query.all()
+
