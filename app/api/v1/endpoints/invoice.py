@@ -2,10 +2,21 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db.session import get_db
 from schemas.invoice import InvoiceCreate, InvoiceStatusUpdate, InvoiceOut
-from crud import invoice as crud_invoice
+from repositories import invoice as crud_invoice
 
 router = APIRouter()
 
+@router.get("/", response_model=list[InvoiceOut])
+def get_all_invoices(db: Session = Depends(get_db)):
+    raw_data = crud_invoice.get_all_invoices_with_clients(db)  # tavo custom SELECT
+    return [
+        {
+            **invoice.__dict__,
+            "links": generate_links("invoices", invoice.invoice_id, ["update_status", "delete"])
+        }
+        for invoice in raw_data
+    ]
+    
 @router.post("/", response_model=InvoiceOut)
 def create_invoice(invoice: InvoiceCreate, db: Session = Depends(get_db)):
     return crud_invoice.create_invoice(db, invoice)
