@@ -44,3 +44,19 @@ def delete_client(kliento_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Client not found")
     return {"ok": True}
+
+
+@router.get("/{kliento_id}/orders", response_model=list[schemas.OrderOut])
+def get_client_orders(kliento_id: int, db: Session = Depends(get_db)):
+    orders = repo.get_by_client_id(db, kliento_id)
+    return [
+        {
+            **order.__dict__,
+            "links": [
+                {"rel": "self", "href": f"/orders/{order.uzsakymo_id}"},
+                {"rel": "car", "href": f"/cars/{order.automobilio_id}"},
+                {"rel": "delete", "href": f"/orders/{order.uzsakymo_id}"}
+            ]
+        }
+        for order in orders
+    ]
