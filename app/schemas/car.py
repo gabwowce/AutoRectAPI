@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 from datetime import date
 
+from app.schemas.location import LocationOut
+
 # 1️⃣ Bendras pagrindas visoms schemoms
 class CarBase(BaseModel):
     marke: str
@@ -33,14 +35,15 @@ class CarCreate(CarBase):
 class CarUpdate(CarBase):
     pass
 
-# 4️⃣ Tik statuso atnaujinimui (PATCH /status)
-class CarStatusUpdate(BaseModel):
-    status: str
-
-# 5️⃣ Atsakymo schema su ID ir HATEOAS nuorodomis
-class CarOut(CarBase):
+class CarOut(BaseModel):
     automobilio_id: int
-    links: List[Dict]
+    # ... kiti laukai
+    dabartine_vieta_id: int
+    lokacija: Optional[LocationOut]
+    links: list[dict]
 
     class Config:
         orm_mode = True
+
+class CarStatusUpdate(BaseModel):
+    status: str

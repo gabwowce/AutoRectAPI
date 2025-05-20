@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, Date
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DECIMAL, Date
 from app.db.base import Base
+from sqlalchemy.orm import relationship
+from app.models.location import Location
 
 class Car(Base):
     __tablename__ = "Automobiliai"
@@ -23,5 +25,7 @@ class Car(Base):
     kaina_parai = Column(DECIMAL(10,2), nullable=False)
     automobilio_statusas = Column(String, nullable=False)
     technikines_galiojimas = Column(Date, nullable=False)
-    dabartine_vieta_id = Column(Integer, nullable=False)
+    dabartine_vieta_id = Column(Integer, ForeignKey("pristatymo_vietos.vietos_id"))
     pastabos = Column(String)
+
+    lokacija = relationship(Location, backref="automobiliai")
