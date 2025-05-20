@@ -1,6 +1,10 @@
 from sqlalchemy.orm import Session
 from app.models.reservation import Reservation
 from app.schemas.reservation import ReservationCreate
+from sqlalchemy import desc
+from models.reservation import Reservation
+from models.car import Car
+from models.client import Client
 
 def get_all(db: Session):
     return db.query(Reservation).all()
@@ -22,3 +26,22 @@ def delete(db: Session, rezervacijos_id: int):
         db.commit()
         return True
     return False
+    
+def get_latest_reservations_with_details(db: Session, limit: int = 5):
+    return (
+        db.query(
+            Reservation.rezervacijos_id,
+            Reservation.rezervacijos_pradzia,
+            Reservation.rezervacijos_pabaiga,
+            Car.marke,
+            Car.modelis,
+            Client.vardas,
+            Client.pavarde,
+        )
+        .join(Car, Reservation.automobilio_id == Car.automobilio_id)
+        .join(Client, Reservation.kliento_id == Client.kliento_id)
+        .order_by(desc(Reservation.rezervacijos_pradzia))
+        .limit(limit)
+        .all()
+    )
+
