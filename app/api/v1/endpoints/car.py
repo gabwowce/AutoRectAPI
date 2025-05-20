@@ -102,3 +102,13 @@ def search_cars(
         }
         for car in results
     ]
+
+@router.get("/cars/free", response_model=List[CarOut])
+def get_free_cars(db: Session = Depends(get_db)):
+    cars = (
+        db.query(Car)
+        .filter(Car.automobilio_statusas == "laisvas")
+        .all()
+    )
+    return cars
+
