@@ -25,6 +25,7 @@ def get_all_orders(db: Session = Depends(get_db)):
         }
         for order in orders
     ]
+
 @router.get("/{uzsakymo_id}", response_model=schemas.OrderOut)
 def get_order(uzsakymo_id: int, db: Session = Depends(get_db)):
     order = repo.get_by_id(db, uzsakymo_id)
@@ -45,7 +46,12 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     created = repo.create(db, order)
     return {
         **created.__dict__,
-        "links": generate_links("orders", created.uzsakymo_id, ["delete"])
+        "links": [
+            {"rel": "self", "href": f"/orders/{created.uzsakymo_id}"},
+            {"rel": "client", "href": f"/clients/{created.kliento_id}"},
+            {"rel": "car", "href": f"/cars/{created.automobilio_id}"},
+            {"rel": "delete", "href": f"/orders/{created.uzsakymo_id}"}
+        ]
     }
 
 @router.delete("/{uzsakymo_id}")
@@ -55,6 +61,23 @@ def delete_order(uzsakymo_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Order not found")
     return {"ok": True}
 
-def get_by_client_id(db: Session, kliento_id: int):
-    return db.query(Order).filter(Order.kliento_id == kliento_id).all()
+@router.get("/stats/by-status")
+def get_order_stats_by_status(db: Session = Depends(get_db)):
+    return repo.get_order_counts_by_status(db)
+
+@router.get("/by-client/{kliento_id}", response_model=list[schemas.OrderOut])
+def get_orders_by_client(kliento_id: int, db: Session = Depends(get_db)):
+    orders = repo.get_by_client_id(db, kliento_id)
+    return [
+        {
+            **order.__dict__,
+            "links": [
+                {"rel": "self", "href": f"/orders/{order.uzsakymo_id}"},
+                {"rel": "client", "href": f"/clients/{order.kliento_id}"},
+                {"rel": "car", "href": f"/cars/{order.automobilio_id}"},
+                {"rel": "delete", "href": f"/orders/{order.uzsakymo_id}"}
+            ]
+        }
+        for order in orders
+    ]
 
