@@ -1,6 +1,8 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date
+from typing import List, Dict
 
+# 1️⃣ Bendri laukai (tėvinė schema)
 class ClientBase(BaseModel):
     vardas: str
     pavarde: str
@@ -9,13 +11,19 @@ class ClientBase(BaseModel):
     gimimo_data: date
     registracijos_data: date
     bonus_taskai: int
-    links: List[Dict]
 
+# 2️⃣ Schema kurti naujam klientui
 class ClientCreate(ClientBase):
     pass
 
-class Client(ClientBase):
+# 3️⃣ Schema atnaujinimui (jei norėsi PUT/PATCH)
+class ClientUpdate(ClientBase):
+    pass
+
+# 4️⃣ Schema atsakymams (su ID ir links)
+class ClientOut(ClientBase):
     kliento_id: int
+    links: List[Dict]
 
     class Config:
         orm_mode = True
