@@ -3,25 +3,40 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.schemas import client as schemas
 from app.repositories import client as repo
+from utils.hateoas import generate_links
 
 router = APIRouter(
-    prefix="/client",
+    prefix="/clients",  
 )
 
-@router.get("/", response_model=list[schemas.Client])
+@router.get("/", response_model=list[schemas.ClientOut])
 def get_all_clients(db: Session = Depends(get_db)):
-    return repo.get_all(db)
+    clients = repo.get_all(db)
+    return [
+        {
+            **client.__dict__,
+            "links": generate_links("clients", client.kliento_id, ["update", "delete"])
+        }
+        for client in clients
+    ]
 
-@router.get("/{kliento_id}", response_model=schemas.Client)
+@router.get("/{kliento_id}", response_model=schemas.ClientOut)
 def get_client(kliento_id: int, db: Session = Depends(get_db)):
     client = repo.get_by_id(db, kliento_id)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
-    return client
+    return {
+        **client.__dict__,
+        "links": generate_links("clients", client.kliento_id, ["update", "delete"])
+    }
 
-@router.post("/", response_model=schemas.Client)
+@router.post("/", response_model=schemas.ClientOut)
 def create_client(client: schemas.ClientCreate, db: Session = Depends(get_db)):
-    return repo.create(db, client)
+    created = repo.create(db, client)
+    return {
+        **created.__dict__,
+        "links": generate_links("clients", created.kliento_id, ["update", "delete"])
+    }
 
 @router.delete("/{kliento_id}")
 def delete_client(kliento_id: int, db: Session = Depends(get_db)):
