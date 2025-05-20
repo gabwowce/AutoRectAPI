@@ -68,3 +68,6 @@ def update_car_status(car_id: int, data: CarStatusUpdate, db: Session = Depends(
         "links": generate_links("cars", updated.id, ["update", "delete", "update_status"])
     }
 
+@router.get("/stats/by-status")
+def get_car_stats_by_status(db: Session = Depends(get_db)):
+    return car_repo.get_car_counts_by_status(db)
