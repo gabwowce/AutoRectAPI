@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db.session import get_db
-from schemas.client_support import ClientSupportCreate, ClientSupportOut
+from schemas.client_support import ClientSupportCreate, ClientSupportOut, ClientSupportUpdate
 from crud import client_support
 from utils.hateoas import generate_links
 
@@ -37,4 +37,14 @@ def get_support(uzklausos_id: int, db: Session = Depends(get_db)):
     return {
         **support.__dict__,
         "links": generate_links("support", support.uzklausos_id, ["delete"])
+    }
+
+@router.patch("/{uzklausos_id}", response_model=ClientSupportOut)
+def answer_to_support(uzklausos_id: int, data: ClientSupportUpdate, db: Session = Depends(get_db)):
+    updated = client_support.update_support_request(db, uzklausos_id, data)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Support request not found")
+    return {
+        **updated.__dict__,
+        "links": generate_links("support", updated.uzklausos_id, ["delete"])
     }
