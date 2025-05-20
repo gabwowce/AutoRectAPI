@@ -24,3 +24,6 @@ def update_support_request(db: Session, uzklausos_id: int, data: ClientSupportUp
     db.commit()
     db.refresh(support)
     return support
+    
+def get_unanswered_requests(db: Session):
+    return db.query(ClientSupport).filter(ClientSupport.atsakymas == None).all()
