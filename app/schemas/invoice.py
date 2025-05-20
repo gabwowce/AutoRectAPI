@@ -1,14 +1,23 @@
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional
 
-class InvoiceOut(BaseModel):
-    saskaitos_id: int
-    uzsakymo_id: int
-    suma: float
-    saskaitos_data: date
-    kliento_vardas: str
-    kliento_pavarde: str
-    busena: str
+class InvoiceBase(BaseModel):
+    order_id: int
+    total: float
+    invoice_date: date
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+class InvoiceStatusUpdate(BaseModel):
+    status: str
+
+class InvoiceOut(InvoiceBase):
+    invoice_id: int
+    client_first_name: str
+    client_last_name: str
+    status: str
 
     class Config:
         orm_mode = True
