@@ -12,7 +12,7 @@ router = APIRouter(
     tags=["Reservations"]
 )
 
-@router.get("/", response_model=list[schemas.ReservationOut])
+@router.get("/", response_model=list[schemas.ReservationOut], operation_id="getAllReservations")
 def get_all_reservations(db: Session = Depends(get_db)):
     reservations = repo.get_all(db)
     return [
@@ -28,7 +28,7 @@ def get_all_reservations(db: Session = Depends(get_db)):
     ]
 
 
-@router.get("/{rezervacijos_id}", response_model=schemas.ReservationOut)
+@router.get("/{rezervacijos_id}", response_model=schemas.ReservationOut, operation_id="getReservationById")
 def get_reservation(rezervacijos_id: int, db: Session = Depends(get_db)):
     res = repo.get_by_id(db, rezervacijos_id)
     if not res:
@@ -38,7 +38,7 @@ def get_reservation(rezervacijos_id: int, db: Session = Depends(get_db)):
         "links": generate_links("reservations", res.rezervacijos_id, ["delete"])
     }
 
-@router.post("/", response_model=schemas.ReservationOut)
+@router.post("/", response_model=schemas.ReservationOut, operation_id="createReservation")
 def create_reservation(reservation: schemas.ReservationCreate, db: Session = Depends(get_db)):
     created = repo.create(db, reservation)
     return {
@@ -46,14 +46,14 @@ def create_reservation(reservation: schemas.ReservationCreate, db: Session = Dep
         "links": generate_links("reservations", created.rezervacijos_id, ["delete"])
     }
 
-@router.delete("/{rezervacijos_id}")
+@router.delete("/{rezervacijos_id}", operation_id="deleteReservation")
 def delete_reservation(rezervacijos_id: int, db: Session = Depends(get_db)):
     success = repo.delete(db, rezervacijos_id)
     if not success:
         raise HTTPException(status_code=404, detail="Reservation not found")
     return {"ok": True}
 
-@router.get("/latest", response_model=list[schemas.ReservationSummary])
+@router.get("/latest", response_model=list[schemas.ReservationSummary], operation_id="getLatestReservations")
 def get_latest_reservations(db: Session = Depends(get_db), limit: int = 5):
     results = repo.get_latest_reservations_with_details(db, limit=limit)
     return [
@@ -74,7 +74,7 @@ def get_latest_reservations(db: Session = Depends(get_db), limit: int = 5):
         for r in results
     ]
 
-@router.get("/search", response_model=list[schemas.ReservationOut])
+@router.get("/search", response_model=list[schemas.ReservationOut], operation_id="searchReservations")
 def search_reservations(
     db: Session = Depends(get_db),
     kliento_id: Optional[int] = None,

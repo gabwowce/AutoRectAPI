@@ -11,7 +11,7 @@ router = APIRouter(
     prefix="/clients",  
 )
 
-@router.get("/", response_model=list[schemas_client.ClientOut])
+@router.get("/", response_model=list[schemas_client.ClientOut], operation_id="getAllClients")
 def get_all_clients(db: Session = Depends(get_db)):
     clients = repo.get_all(db)
     return [
@@ -22,7 +22,7 @@ def get_all_clients(db: Session = Depends(get_db)):
         for client in clients
     ]
 
-@router.get("/{kliento_id}", response_model=schemas_client.ClientOut)
+@router.get("/{kliento_id}", response_model=schemas_client.ClientOut, operation_id="getClientById")
 def get_client(kliento_id: int, db: Session = Depends(get_db)):
     client = repo.get_by_id(db, kliento_id)
     if not client:
@@ -32,7 +32,7 @@ def get_client(kliento_id: int, db: Session = Depends(get_db)):
         "links": generate_links("clients", client.kliento_id, ["update", "delete"])
     }
 
-@router.post("/", response_model=schemas_client.ClientOut)
+@router.post("/", response_model=schemas_client.ClientOut, operation_id="createClient")
 def create_client(client: schemas_client.ClientCreate, db: Session = Depends(get_db)):
     created = repo.create(db, client)
     return {
@@ -40,7 +40,7 @@ def create_client(client: schemas_client.ClientCreate, db: Session = Depends(get
         "links": generate_links("clients", created.kliento_id, ["update", "delete"])
     }
 
-@router.delete("/{kliento_id}")
+@router.delete("/{kliento_id}", operation_id="deleteClient")
 def delete_client(kliento_id: int, db: Session = Depends(get_db)):
     success = repo.delete(db, kliento_id)
     if not success:
@@ -48,7 +48,7 @@ def delete_client(kliento_id: int, db: Session = Depends(get_db)):
     return {"ok": True}
 
 
-@router.get("/{kliento_id}/orders", response_model=list[schemas_order.OrderOut])
+@router.get("/{kliento_id}/orders", response_model=list[schemas_order.OrderOut], operation_id="getClientOrder")
 def get_client_orders(kliento_id: int, db: Session = Depends(get_db)):
     orders = repo.get_by_client_id(db, kliento_id)
     return [

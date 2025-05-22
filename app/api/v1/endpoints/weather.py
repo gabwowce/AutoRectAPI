@@ -11,7 +11,7 @@ OPENWEATHER_API_KEY = "93dde574b8b9262f8f1a1590f1bdf790"
 
 
 
-@router.get("/weather")
+@router.get("/weather", operation_id="getWeatherForecast")
 def get_weather_forecast(city: str = Query(...), date: str = Query(...)):
     """
     Grąžina valandinę prognozę pasirinktai datai ir miestui

@@ -8,7 +8,7 @@ from app.api.deps import get_current_user, get_db
 
 router = APIRouter()
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse, operation_id="login")
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     db_user = employee_repo.get_by_email(db, request.el_pastas)
     if not db_user or not verify_password(request.slaptazodis, db_user.slaptazodis):
@@ -17,7 +17,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     token = create_access_token(data={"sub": db_user.el_pastas})
     return TokenResponse(access_token=token)
 
-@router.post("/register")
+@router.post("/register", operation_id="register")
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
     existing = employee_repo.get_by_email(db, request.el_pastas)
     if existing:
@@ -31,7 +31,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     new_employee = employee_repo.create_employee(db, employee_data)
     return {"message": "Employee created successfully", "id": new_employee.darbuotojo_id}
 
-@router.post("/logout")
+@router.post("/logout", operation_id="logout")
 def logout():
     return {"message": "Successfully logged out"}
 
@@ -39,7 +39,7 @@ def logout():
 def me(current_user = Depends(get_current_user)):
     return current_user
 
-@router.post("/change-password")
+@router.post("/change-password", operation_id="changePassword")
 def change_password(
     request: ChangePasswordRequest,
     db: Session = Depends(get_db),
