@@ -35,12 +35,10 @@ class CarCreate(CarBase):
 class CarUpdate(CarBase):
     pass
 
-class CarOut(BaseModel):
+class CarOut(CarBase):
     automobilio_id: int
-    # ... kiti laukai
-    dabartine_vieta_id: int
     lokacija: Optional[LocationOut]
-    links: list[dict]
+    links: List[dict]
 
     class Config:
         orm_mode = True
