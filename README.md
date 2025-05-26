@@ -215,15 +215,7 @@ app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
 
 UPDATED:
 
-# 🚗 Car Rental System API
-
-> **Stack:** FastAPI · SQLAlchemy · MySQL · JWT · RTK Query · Leaflet · OpenCage Geocoder
-
-A production‑ready REST API for **internal car‑rental operations** (employees only).
-Provides full CRUD for cars, reservations, orders, invoices, support tickets and more.
-Frontend (React + Next.js) consumes this API via `carRentalApi` (RTK Query).
-
----
+# Car Rental System API
 
 ## 🗂 Repository Layout
 
