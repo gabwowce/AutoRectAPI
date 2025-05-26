@@ -92,7 +92,7 @@ Pilnas CRUD + būsenos keitimas:
 ### 1. Klonavimas ir priklausomybės:
 
 ```bash
-git clone https://github.com/TAVO-VARDAS/autorent_api.git
+git clone https://github.com/gabwowce/AutoRectAPI.git
 cd autorent_api
 pip install -r requirements.txt
 ```
