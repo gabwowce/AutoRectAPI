@@ -212,3 +212,156 @@ app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
 ---
 
 📅 README atnaujinta: 2025-04-22
+
+UPDATED:
+
+# 🚗 Car Rental System API
+
+> **Stack:** FastAPI · SQLAlchemy · MySQL · JWT · RTK Query · Leaflet · OpenCage Geocoder
+
+A production‑ready REST API for **internal car‑rental operations** (employees only).
+Provides full CRUD for cars, reservations, orders, invoices, support tickets and more.
+Frontend (React + Next.js) consumes this API via `carRentalApi` (RTK Query).
+
+---
+
+## 🗂 Repository Layout
+
+```
+app/
+├── api/v1/endpoints/   # FastAPI routers (public surface)
+├── db/                 # Session & Base
+├── models/             # SQLAlchemy models (DB schema)
+├── repositories/       # Data‑access layer (pure SQL/ORM)
+├── schemas/            # Pydantic I/O contracts
+└── services/           # Business logic (JWT, hashing, weather, etc.)
+init_db.sql             # Schema + seed data
+requirements.txt        # All deps (see below)
+```
+
+---
+
+## ⚙️ Quick Start (local)
+
+```bash
+# 1. Clone & install
+$ git clone https://github.com/<your-org>/car-rental-api.git
+$ cd car-rental-api
+$ pip install -r requirements.txt
+
+# 2. Configure ENV
+$ cp .env.example .env   # edit DB URL + JWT_SECRET + SMTP creds, etc.
+
+# 3. Prepare database (MySQL)
+$ mysql -u root -p -e "CREATE DATABASE autorentdb;"
+$ mysql -u root -p autorentdb < init_db.sql
+
+# 4. Run API (dev)
+$ uvicorn app.main:app --reload
+# Swagger → http://localhost:8000/docs
+```
+
+---
+
+## 📦 Dependencies (`requirements.txt`)
+
+```
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+passlib[bcrypt]
+python-jose[cryptography]
+pydantic
+email-validator
+dotenv
+httpx            # async HTTP (OpenCage, weather)
+```
+
+---
+
+## 🔐 Authentication Flow
+
+| Step     | Endpoint                     | Body                                            | Response                                     |
+| -------- | ---------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| Login    | `POST /api/v1/auth/login`    | `{ "email":"john@corp.com", "password":"•••" }` | `{"access_token":"…","token_type":"bearer"}` |
+| Register | `POST /api/v1/auth/register` | employee fields                                 | 201 Created                                  |
+| Who am I | `GET /api/v1/auth/me`        | —                                               | EmployeeOut                                  |
+
+JWT is sent as `Authorization: Bearer <token>` for every protected call.
+
+---
+
+## 🌐 Public API (v1)
+
+All routes are prefixed with `/api/v1`.
+
+### Employees
+
+```
+GET  /employees/            → List[Employee]
+GET  /employees/{id}        → Employee
+POST /employees/            → Employee (create)
+PUT  /employees/{id}        → Employee (full update)
+DELETE /employees/{id}      → 204
+```
+
+### Cars
+
+```
+GET  /cars/                 → List[Car]
+GET  /cars/{id}             → Car details
+POST /cars/                 → Car (create)
+PUT  /cars/{id}             → Car (update)
+PATCH /cars/{id}/status     → Change status (free / rented / service)
+DELETE /cars/{id}           → 204
+```
+
+### Reservations
+
+```
+GET  /reservations/         → List[Reservation]
+POST /reservations/         → Reservation
+GET  /reservations/{id}     → Reservation
+DELETE /reservations/{id}   → 204
+```
+
+### Orders & Invoices
+
+```
+GET  /orders/               → List[Order]
+POST /orders/               → Order
+GET  /orders/{id}           → Order
+DELETE /orders/{id}         → 204
+
+GET  /invoices/             → List[Invoice]
+POST /invoices/             → Invoice (generate from Order)
+PATCH /invoices/{id}/status → Mark paid/unpaid
+DELETE /invoices/{id}       → 204
+```
+
+### Client Support
+
+```
+GET  /support/              → List[Ticket]
+POST /support/              → Create ticket
+GET  /support/{id}          → Ticket
+POST /support/{id}/answer   → Respond
+GET  /support/unanswered    → Only open tickets
+```
+
+### Weather (external)
+
+- **Provider:** Open‑Meteo
+- Endpoint: `GET /weather/{city}`
+
+### Geocoding (external ↦ internal cache)
+
+```
+POST /geocode               → { lat, lng }
+Body: { "adresas": "Konstitucijos pr. 3, Vilnius" }
+```
+
+- Uses **OpenCage** via `httpx` (async) & caches results in‑memory + DB.
+
+---
