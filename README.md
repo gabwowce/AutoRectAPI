@@ -342,12 +342,12 @@ POST /support/{id}/answer   → Respond
 GET  /support/unanswered    → Only open tickets
 ```
 
-### Weather (external)
+### Weather
 
 - **Provider:** Open‑Meteo
 - Endpoint: `GET /weather/{city}`
 
-### Geocoding (external ↦ internal cache)
+### Geocoding 
 
 ```
 POST /geocode               → { lat, lng }
