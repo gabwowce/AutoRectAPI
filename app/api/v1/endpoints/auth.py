@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from app.schemas.auth import LoginRequest, TokenResponse, RegisterRequest, UserInfo, ChangePasswordRequest
 from app.db.session import SessionLocal
@@ -9,13 +9,23 @@ from app.api.deps import get_current_user, get_db
 router = APIRouter()
 
 @router.post("/login", response_model=TokenResponse, operation_id="login")
-def login(request: LoginRequest, db: Session = Depends(get_db)):
+def login(request: LoginRequest, response: Response, db: Session = Depends(get_db)):
     db_user = employee_repo.get_by_email(db, request.el_pastas)
     if not db_user or not verify_password(request.slaptazodis, db_user.slaptazodis):
         raise HTTPException(status_code=401, detail="Invalid login credentials")
 
     token = create_access_token(data={"sub": db_user.el_pastas})
-    return TokenResponse(access_token=token)
+
+    response.set_cookie(
+        key="token",
+        value=token,
+        httponly=True,
+        samesite="Lax",  # arba "None" jei frontend ir backend skirtinguose originuose
+        secure=False,    # naudok True jei tavo svetainė naudoja HTTPS
+        path="/"
+    )
+
+    return {"access_token": token}
 
 @router.post("/register", operation_id="register")
 def register(request: RegisterRequest, db: Session = Depends(get_db)):

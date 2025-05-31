@@ -1,7 +1,7 @@
 from datetime import date
 from sqlalchemy.orm import Session
 from app.models.reservation import Reservation
-from app.schemas.reservation import ReservationCreate
+from app.schemas.reservation import ReservationCreate, ReservationUpdate
 from sqlalchemy import desc
 from app.models.reservation import Reservation
 from app.models.car import Car
@@ -30,6 +30,7 @@ def delete(db: Session, rezervacijos_id: int):
         return True
     return False
     
+# repositories/reservation.py
 def get_latest_reservations_with_details(db: Session, limit: int = 5):
     return (
         db.query(
@@ -38,17 +39,31 @@ def get_latest_reservations_with_details(db: Session, limit: int = 5):
             Reservation.automobilio_id,
             Reservation.rezervacijos_pradzia,
             Reservation.rezervacijos_pabaiga,
+            Reservation.busena,
             Car.marke,
             Car.modelis,
             Client.vardas,
             Client.pavarde,
         )
-        .join(Car, Reservation.automobilio_id == Car.automobilio_id)
-        .join(Client, Reservation.kliento_id == Client.kliento_id)
-        .order_by(desc(Reservation.rezervacijos_pradzia))
+        .join(Car, Car.automobilio_id == Reservation.automobilio_id)
+        .join(Client, Client.kliento_id == Reservation.kliento_id)
+        .order_by(Reservation.rezervacijos_pradzia.desc())
         .limit(limit)
         .all()
     )
+
+def update(db: Session, rezervacijos_id: int, update_data: ReservationUpdate):
+    reservation = db.query(Reservation).filter(Reservation.rezervacijos_id == rezervacijos_id).first()
+    if not reservation:
+        return None
+
+    update_dict = update_data.dict(exclude_unset=True)
+    for key, value in update_dict.items():
+        setattr(reservation, key, value)
+
+    db.commit()
+    db.refresh(reservation)
+    return reservation
 
 def search_reservations(
     db: Session,
