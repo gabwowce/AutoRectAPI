@@ -5,6 +5,6 @@ class Location(Base):
     __tablename__ = "pristatymo_vietos"
 
     vietos_id = Column(Integer, primary_key=True, index=True)
-    pavadinimas = Column(String, nullable=False)
-    adresas = Column(String, nullable=False)
-    miestas = Column(String, nullable=False)
+    pavadinimas = Column(String(100), nullable=False)
+    adresas = Column(String(255), nullable=False)
+    miestas = Column(String(100), nullable=False)
